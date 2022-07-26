@@ -1,0 +1,2 @@
+go build main.go – сборка
+go run main.go – сразу запуск
