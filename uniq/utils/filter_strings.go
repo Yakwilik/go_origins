@@ -15,9 +15,12 @@ func doInvert(value bool, flag bool) bool {
 }
 func FilterStringsByMetCount(linesWithMetInfo []StringWithMetCount, duplicates bool) (filteredLines []string) {
 	for _, lineWithMetInfo := range linesWithMetInfo {
-		if doInvert(lineWithMetInfo.MetCount == 1, duplicates) {
+		if !duplicates {
+			filteredLines = append(filteredLines, lineWithMetInfo.Str)
+		} else if lineWithMetInfo.MetCount > 1 {
 			filteredLines = append(filteredLines, lineWithMetInfo.Str)
 		}
+
 	}
 	return filteredLines
 }

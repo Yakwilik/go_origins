@@ -19,8 +19,11 @@ func main() {
 		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(-1)
 	}
+	fmt.Println(opts.OutputFile)
 	lines = handlers.HandleLines(lines, opts)
-	for _, str := range lines {
-		fmt.Println(str)
+	err = io.OutputLines(lines, opts.OutputFile)
+	if err != nil {
+		_, _ = fmt.Fprintln(os.Stderr, err)
+		os.Exit(-1)
 	}
 }
