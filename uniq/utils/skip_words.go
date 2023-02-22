@@ -1,4 +1,4 @@
-package handlers
+package utils
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ func getWordsCount(line string) int {
 	return strings.Count(strings.Trim(line, " "), " ") + 1
 }
 
-func skipWords(line string, skipWordsCount int) (resultLine string) {
+func SkipWords(line string, skipWordsCount int) (resultLine string) {
 	wordsCount := getWordsCount(line)
 	if wordsCount <= skipWordsCount {
 		return resultLine

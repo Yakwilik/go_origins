@@ -1,6 +1,6 @@
-package handlers
+package utils
 
-func skipChars(line string, skipCharsCount int) (resultLine string) {
+func SkipChars(line string, skipCharsCount int) (resultLine string) {
 	if len(line) < skipCharsCount {
 		return resultLine
 	}

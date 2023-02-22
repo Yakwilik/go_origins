@@ -10,8 +10,7 @@ func HandleLines(lines []string, opts options.Options) (resultLines []string) {
 		resultLines = showStrMeetCount(lines, opts)
 		break
 	case opts.EShowNotUniqueStr:
-		break
-		//return getUniqLines(lines, opts)
+		resultLines = ShowNotUniqueStr(lines, opts)
 	case opts.EShowUniqueStr:
 		break
 		//return getDuplicateLines(lines, opts)
