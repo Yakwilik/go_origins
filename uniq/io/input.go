@@ -6,14 +6,6 @@ import (
 	"os"
 )
 
-func readLines(file *os.File) (lines []string, err error) {
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
-
 func GetLines(inputFilename string) (lines []string, err error) {
 	input := os.Stdin
 
@@ -31,4 +23,12 @@ func GetLines(inputFilename string) (lines []string, err error) {
 	}
 
 	return readLines(input)
+}
+
+func readLines(file *os.File) (lines []string, err error) {
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	return lines, scanner.Err()
 }

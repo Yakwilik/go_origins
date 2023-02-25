@@ -17,34 +17,31 @@ type Options struct {
 }
 
 func GetOptions() (opts Options, err error) {
-	flag.BoolVar(&opts.EShowStrMeetCount, eShowStrMeetCountFlag, opts.EShowStrMeetCount, showStrMeetCountFlagUsage)
-	flag.BoolVar(&opts.EShowNotUniqueStr, eShowNotUniqueStrFlag, opts.EShowNotUniqueStr, showNotUniqueStrFlagUsage)
-	flag.BoolVar(&opts.EShowUniqueStr, eShowUniqueStrFlag, opts.EShowUniqueStr, showUniqueStrFlagUsage)
-	flag.IntVar(&opts.SkippedStringsCount, skippedStringsCountFlag, opts.SkippedStringsCount, skippedStringsCountFlagUsage)
-	flag.IntVar(&opts.SkippedCharsCount, skippedCharsCountFlag, opts.SkippedCharsCount, skippedCharsCountFlagUsage)
-	flag.BoolVar(&opts.IgnoreRegister, ignoreRegisterFlag, opts.IgnoreRegister, ignoreRegisterUsage)
+	flag.BoolVar(&opts.EShowStrMeetCount, "c", false, showStrMeetCountFlagUsage)
+	flag.BoolVar(&opts.EShowNotUniqueStr, "d", false, showNotUniqueStrFlagUsage)
+	flag.BoolVar(&opts.EShowUniqueStr, "u", false, showUniqueStrFlagUsage)
+	flag.IntVar(&opts.SkippedStringsCount, "f", 0, skippedStringsCountFlagUsage)
+	flag.IntVar(&opts.SkippedCharsCount, "s", 0, skippedCharsCountFlagUsage)
+	flag.BoolVar(&opts.IgnoreRegister, "i", false, ignoreRegisterUsage)
 	flag.Parse()
 	opts.InputFile = flag.Arg(0)
 	opts.OutputFile = flag.Arg(1)
 	return opts, opts.validateOptions()
 }
 
-/*
- */
 func (o *Options) validateOptions() (err error) {
-	exclusiveFlagMet := 0
+	exclusiveFlagsCount := 0
 
-	checkFlag := func(f bool, count *int) {
-		if f {
-			*count++
+	checkFlag := func(isFlagTrue bool) {
+		if isFlagTrue {
+			exclusiveFlagsCount++
 		}
 	}
-	checkFlag(o.EShowStrMeetCount, &exclusiveFlagMet)
-	checkFlag(o.EShowNotUniqueStr, &exclusiveFlagMet)
-	checkFlag(o.EShowUniqueStr, &exclusiveFlagMet)
-	if exclusiveFlagMet > 1 {
-		return fmt.Errorf("only one of these flags are possible at one: %s, %s, %s",
-			eShowStrMeetCountFlag, eShowNotUniqueStrFlag, eShowUniqueStrFlag)
+	checkFlag(o.EShowStrMeetCount)
+	checkFlag(o.EShowNotUniqueStr)
+	checkFlag(o.EShowUniqueStr)
+	if exclusiveFlagsCount > 1 {
+		return fmt.Errorf("only one of these flags are possible at ones: -c, -d, -u")
 	}
 	return err
 }

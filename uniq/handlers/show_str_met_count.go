@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"fmt"
+
 	"GolangCourse/uniq/options"
 	"GolangCourse/uniq/utils"
-	"fmt"
 )
 
 func formatMeetCountResult(linesWithMetInfo []utils.StringWithMetCount) (result []string) {

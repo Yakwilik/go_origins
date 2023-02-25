@@ -9,11 +9,11 @@ func HandleLines(lines []string, opts options.Options) (resultLines []string) {
 	case opts.EShowStrMeetCount:
 		resultLines = showStrMeetCount(lines, opts)
 	case opts.EShowNotUniqueStr:
-		resultLines = ShowNotUniqueStr(lines, opts)
+		resultLines = showNotUniqueStr(lines, opts)
 	case opts.EShowUniqueStr:
-		resultLines = ShowUniqueStrStrict(lines, opts)
+		resultLines = showUniqueStrStrict(lines, opts)
 	default:
-		resultLines = ShowUniqueStr(lines, opts)
+		resultLines = showUniqueStr(lines, opts)
 	}
 	return resultLines
 }

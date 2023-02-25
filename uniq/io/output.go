@@ -5,18 +5,18 @@ import (
 	"os"
 )
 
-func OutputLines(lines []string, inputFilename string) (err error) {
+func OutputLines(lines []string, outputFilename string) (err error) {
 	output := os.Stdout
 
-	if inputFilename != "" {
-		output, err = os.Create(inputFilename)
+	if outputFilename != "" {
+		output, err = os.Create(outputFilename)
 		if err != nil {
 			return err
 		}
 		defer func() {
-			err = output.Close()
+			closeErr := output.Close()
 			if err != nil {
-				log.Printf("error occured while closing file: %s", err)
+				log.Printf("error occured while closing file: %s", closeErr)
 			}
 		}()
 	}

@@ -55,6 +55,26 @@ func TestSkipWords(t *testing.T) {
 	}
 }
 
+func TestSkipWordsAndChars(t *testing.T) {
+	str := "one two three"
+	rslt := "wo three"
+	if SkipWordsAndChars(str, 1, 1) != rslt {
+		t.Fatalf("Words and chars skipping works wrong")
+	}
+
+	str = "one two three"
+	rslt = "three"
+	if SkipWordsAndChars(str, 2, 0) != rslt {
+		t.Fatalf("Words and chars skipping works wrong")
+	}
+
+	str = "one two three"
+	rslt = ""
+	if SkipWordsAndChars(str, 3, 0) != rslt {
+		t.Fatalf("Words and chars skipping works wrong")
+	}
+
+}
 func TestGetStringsWithMetCount(t *testing.T) {
 	strs := []string{
 		"I love music.",
@@ -144,6 +164,13 @@ func TestGetStringsWithMetCount(t *testing.T) {
 	if !reflect.DeepEqual(GetStringsWithMetCount(strs, true, 1, 1), rslt) {
 		t.Fatalf("Struct must be equal")
 	}
+	strs = []string{}
+	rslt = []StringWithMetCount{}
+
+	if len(rslt) != len(GetStringsWithMetCount(strs, true, 0, 0)) {
+		t.Fatalf("Struct must be equal")
+	}
+
 }
 
 func TestGetStringCompareFunc(t *testing.T) {
@@ -181,4 +208,51 @@ func TestGetStringCompareFunc(t *testing.T) {
 		t.Errorf("Compare function must not ignore registr")
 	}
 
+}
+
+func TestFilterStringsByMetCount(t *testing.T) {
+	strs := []StringWithMetCount{
+		{Str: "I love music.", MetCount: 3},
+		{Str: "", MetCount: 1},
+		{Str: "I love music of Kartik.", MetCount: 2},
+		{Str: "Thanks.", MetCount: 1},
+		{Str: "I love music of Kartik.", MetCount: 2},
+	}
+	uniques := []string{
+		"I love music.",
+		"",
+		"I love music of Kartik.",
+		"Thanks.",
+		"I love music of Kartik.",
+	}
+	duplicates := []string{
+		"I love music.",
+		"I love music of Kartik.",
+		"I love music of Kartik.",
+	}
+	if !reflect.DeepEqual(uniques, FilterStringsByMetCount(strs, false)) {
+		t.Fatalf("strings must be equal")
+	}
+	if !reflect.DeepEqual(duplicates, FilterStringsByMetCount(strs, true)) {
+		t.Fatalf("strings must be equal")
+	}
+}
+
+func TestFilterUniqueStrings(t *testing.T) {
+	strs := []StringWithMetCount{
+		{Str: "I love music.", MetCount: 3},
+		{Str: "", MetCount: 1},
+		{Str: "I love music of Kartik.", MetCount: 2},
+		{Str: "Thanks.", MetCount: 1},
+		{Str: "I love music of Kartik.", MetCount: 2},
+	}
+	result := []string{
+		"I love music.",
+		"",
+		"I love music of Kartik.",
+		"Thanks",
+	}
+	if !reflect.DeepEqual(FilterUniqueStrings(strs), result) {
+		t.Fatalf("Wrong result")
+	}
 }

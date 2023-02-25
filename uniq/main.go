@@ -1,29 +1,28 @@
 package main
 
 import (
+	"log"
+
 	"GolangCourse/uniq/handlers"
 	"GolangCourse/uniq/io"
 	"GolangCourse/uniq/options"
-	"fmt"
-	"os"
 )
 
 func main() {
 	opts, err := options.GetOptions()
 	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err)
-		os.Exit(-1)
+		log.Fatalln(err)
 	}
+
 	lines, err := io.GetLines(opts.InputFile)
 	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err)
-		os.Exit(-1)
+		log.Fatalln(err)
 	}
-	fmt.Println(opts.OutputFile)
+
 	lines = handlers.HandleLines(lines, opts)
+	
 	err = io.OutputLines(lines, opts.OutputFile)
 	if err != nil {
-		_, _ = fmt.Fprintln(os.Stderr, err)
-		os.Exit(-1)
+		log.Fatalln(err)
 	}
 }
