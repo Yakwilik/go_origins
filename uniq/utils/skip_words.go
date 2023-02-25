@@ -16,5 +16,5 @@ func SkipWords(line string, skipWordsCount int) (resultLine string) {
 		return resultLine
 	}
 	re := regexp.MustCompile(fmt.Sprintf("^(.*? ){%d}", skipWordsCount))
-	return re.ReplaceAllString(line, "")
+	return re.ReplaceAllString(strings.TrimLeft(line, " "), "")
 }
