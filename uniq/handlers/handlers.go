@@ -1,9 +1,10 @@
 package handlers
 
 import (
+	"fmt"
+
 	"GolangCourse/uniq/options"
 	"GolangCourse/uniq/utils"
-	"fmt"
 )
 
 func HandleLines(lines []string, opts options.Options) (resultLines []string) {
