@@ -247,10 +247,8 @@ func TestFilterUniqueStrings(t *testing.T) {
 		{Str: "I love music of Kartik.", MetCount: 2},
 	}
 	result := []string{
-		"I love music.",
 		"",
-		"I love music of Kartik.",
-		"Thanks",
+		"Thanks.",
 	}
 	if !reflect.DeepEqual(FilterUniqueStrings(strs), result) {
 		t.Fatalf("Wrong result")

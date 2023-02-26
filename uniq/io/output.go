@@ -15,7 +15,7 @@ func OutputLines(lines []string, outputFilename string) (err error) {
 		}
 		defer func() {
 			closeErr := output.Close()
-			if err != nil {
+			if closeErr != nil {
 				log.Printf("error occured while closing file: %s", closeErr)
 			}
 		}()
