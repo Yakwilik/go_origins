@@ -4,7 +4,7 @@ import "fmt"
 
 func ParseNumber(str string, currentIndex int) (res string, parsedRunes int, err error) {
 	metDot := false
-	for currentIndex < len(str) && IsNumber(string(str[currentIndex])) {
+	for currentIndex < len(str) && IsPartOfNumber(string(str[currentIndex])) {
 		token := string(str[currentIndex])
 		if token == "." {
 			if metDot {

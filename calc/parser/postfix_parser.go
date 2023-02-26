@@ -45,7 +45,7 @@ func (p *PostfixParser) Parse() (err error) {
 	for i := 0; i < len(p.infixExpression); i++ {
 		currentToken := string(p.infixExpression[i])
 		switch {
-		case utils.IsNumber(currentToken):
+		case utils.IsPartOfNumber(currentToken):
 			{
 				res, parsedRunes, err := utils.ParseNumber(p.infixExpression, i)
 				if err != nil {
@@ -101,7 +101,7 @@ func (p *PostfixParser) Calculate() float64 {
 	for i := 0; i < len(p.postfixExpression); i++ {
 		currentToken := string(p.postfixExpression[i])
 		switch {
-		case utils.IsNumber(currentToken):
+		case utils.IsPartOfNumber(currentToken):
 			{
 				res, parsedRunes, _ := utils.ParseNumber(p.postfixExpression, i)
 				number, _ := strconv.ParseFloat(res, 64)

@@ -2,7 +2,7 @@ package utils
 
 import "strings"
 
-func IsNumber(value string) bool {
+func IsPartOfNumber(value string) bool {
 	digits := ".0123456789"
 	return strings.Contains(digits, value)
 }

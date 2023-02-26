@@ -30,7 +30,7 @@ func ParseNumber(str string, begin int) (string, int) {
 }
 func main() {
 	var expression string
-	_, err := fmt.Scan(&expression)
+	_, err := fmt.Scanln(&expression)
 	if err != nil {
 		log.Fatalln(err)
 		return
