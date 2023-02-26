@@ -1,0 +1,24 @@
+mode: set
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/auth_mysql.go:12.59,13.41 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/auth_mysql.go:16.2,19.3 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/auth_mysql.go:13.41,15.3 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:9.82,11.16 2 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:14.2,14.12 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:11.16,13.3 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:17.66,19.16 2 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:22.2,24.18 3 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:27.2,27.22 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:30.2,30.12 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:19.16,21.3 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:24.18,26.3 1 0
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/token.go:27.22,29.3 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:8.64,11.16 2 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:14.2,16.21 2 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:11.16,13.3 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:19.78,22.16 2 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:25.2,25.22 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:28.2,30.16 3 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:34.2,34.18 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:22.16,24.3 1 1
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:25.22,27.3 1 0
+gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/repository/mysql/authmysql/user.go:30.16,32.3 1 0

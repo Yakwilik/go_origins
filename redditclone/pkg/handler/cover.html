@@ -1,0 +1,528 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>handler: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/handler/auth.go (100.0%)</option>
+				
+				<option value="file1">gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/handler/comment.go (100.0%)</option>
+				
+				<option value="file2">gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/handler/handler.go (100.0%)</option>
+				
+				<option value="file3">gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/handler/handlers.go (100.0%)</option>
+				
+				<option value="file4">gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/handler/middleware.go (100.0%)</option>
+				
+				<option value="file5">gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/handler/post.go (100.0%)</option>
+				
+				<option value="file6">gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/handler/vote.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package handler
+
+import (
+        "encoding/json"
+        "gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/structs"
+        "net/http"
+)
+
+type signInInput struct {
+        Username string `json:"username"`
+        Password string `json:"password"`
+}
+
+type interfaceMap map[string]interface{}
+
+func (h *Handler) register(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := signInInput{}
+        err := json.NewDecoder(request.Body).Decode(&amp;user)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"error": err})
+                return
+        }</span>
+        <span class="cov8" title="1">newUser := structs.User{
+                ID:       0,
+                Username: user.Username,
+                Password: user.Password,
+        }
+        token, err := h.services.CreateUser(newUser)
+        if err != nil </span><span class="cov8" title="1">{
+                resp := structs.NewErrorResponse()
+                Err := structs.NewErrorMap()
+                Err["location"] = "body"
+                Err["param"] = "username"
+                Err["value"] = newUser.Username
+                Err["msg"] = Err["value"] + " already  exists"
+                Err["err"] = err.Error()
+                resp.Err = append(resp.Err, Err)
+                JSONResponse(writer, http.StatusUnprocessableEntity, resp)
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, interfaceMap{"token": token})</span>
+}
+
+func (h *Handler) login(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := signInInput{}
+        err := json.NewDecoder(request.Body).Decode(&amp;user)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"error": err})
+                return
+        }</span>
+        <span class="cov8" title="1">token, err := h.services.Authorization.GenerateToken(user.Username, user.Password)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "invalid credentials"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, interfaceMap{"token": token})</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package handler
+
+import (
+        "encoding/json"
+        "github.com/gorilla/mux"
+        "gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/structs"
+        "go.mongodb.org/mongo-driver/bson/primitive"
+        "net/http"
+)
+
+func (h *Handler) addComment(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := request.Context().Value(userCTX).(structs.Author)
+        vars := mux.Vars(request)
+        if !primitive.IsValidObjectID(vars[PostID]) </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "empty post id"})
+                return
+        }</span>
+        //  nolint
+        <span class="cov8" title="1">id, _ := primitive.ObjectIDFromHex(vars[PostID])
+
+        commentBody := structs.NewCommentData{}
+        err := json.NewDecoder(request.Body).Decode(&amp;commentBody)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "bad request body"})
+                return
+        }</span>
+        <span class="cov8" title="1">newComment := structs.Comment{
+                Author: structs.Author{
+                        Username: user.Username,
+                        ID:       user.ID,
+                },
+                Body:    commentBody.Comment,
+                Created: "",
+        }
+        comment, err := h.services.Posts.AddComment(newComment, id)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "couldn't create comment"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, comment)</span>
+}
+
+func (h *Handler) deleteComment(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := request.Context().Value(userCTX).(structs.Author)
+        vars := mux.Vars(request)
+        if !primitive.IsValidObjectID(vars[PostID]) </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "bad post_id parameter"})
+                return
+        }</span>
+        //  nolint
+        <span class="cov8" title="1">postID, _ := primitive.ObjectIDFromHex(vars[PostID])
+        if !primitive.IsValidObjectID(vars[CommentID]) </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "bad comment_id parameter"})
+                return
+        }</span>
+        //  nolint
+        <span class="cov8" title="1">commentID, _ := primitive.ObjectIDFromHex(vars[CommentID])
+        post, err := h.services.DeleteComment(commentID, postID, user.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "couldn't delete comment"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, post)</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package handler
+
+import (
+        "github.com/gorilla/mux"
+        "gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/pkg/service"
+        "net/http"
+)
+
+const (
+        CategoryName = "CATEGORY_NAME"
+        PostID       = "POST_ID"
+        CommentID    = "COMMENT_ID"
+        UserLogin    = "USER_LOGIN"
+)
+
+type Handler struct {
+        services *service.Service
+}
+
+func NewHandler(services *service.Service) *Handler <span class="cov8" title="1">{
+
+        return &amp;Handler{services: services}
+}</span>
+
+func (h *Handler) InitRoutes() *http.ServeMux <span class="cov8" title="1">{
+        r := http.NewServeMux()
+
+        r.HandleFunc("/", h.indexHTML)
+        r.Handle("/static/", staticHandler)
+
+        api := mux.NewRouter()
+        r.Handle("/api/", api)
+
+        api.HandleFunc("/api/register", h.register).Methods("POST")
+        api.HandleFunc("/api/login", h.login).Methods("POST")
+        api.HandleFunc("/api/posts/", h.getAllPosts).Methods("GET")
+        api.HandleFunc("/api/posts/{"+CategoryName+"}", h.getPostsByCategory).Methods("GET")
+        api.HandleFunc("/api/post/{"+PostID+"}", h.getPost).Methods("GET")
+        api.HandleFunc("/api/user/{"+UserLogin+"}", h.getPostsByUserLogin).Methods("GET")
+
+        authHandler := mux.NewRouter()
+        authWithMiddlewareHandler := h.authMiddleware(authHandler)
+        api.PathPrefix("/api/").Handler(authWithMiddlewareHandler)
+
+        authHandler.HandleFunc("/api/posts", h.newPost).Methods("POST")
+        authHandler.HandleFunc("/api/post/{"+PostID+"}", h.addComment).Methods("POST")
+        authHandler.HandleFunc("/api/post/{"+PostID+"}/{"+CommentID+"}", h.deleteComment).Methods("DELETE")
+        authHandler.HandleFunc("/api/post/{"+PostID+"}/upvote", h.upvote).Methods("GET")
+        authHandler.HandleFunc("/api/post/{"+PostID+"}/downvote", h.downvote).Methods("GET")
+        authHandler.HandleFunc("/api/post/{"+PostID+"}/unvote", h.unvote).Methods("GET")
+        authHandler.HandleFunc("/api/post/{"+PostID+"}", h.deletePost).Methods("DELETE")
+
+        return r
+}</span>
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package handler
+
+import (
+        "encoding/json"
+        "github.com/sirupsen/logrus"
+        "net/http"
+)
+
+var staticHandler = http.StripPrefix(
+        "/static/",
+        http.FileServer(http.Dir("./static")),
+)
+
+func (h *Handler) indexHTML(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        http.ServeFile(w, r, "static/html/index.html")
+}</span>
+
+func JSONResponse(w http.ResponseWriter, statusCode int, message interface{}) <span class="cov8" title="1">{
+        logrus.Println(message)
+        w.WriteHeader(statusCode)
+        err := json.NewEncoder(w).Encode(message)
+        logrus.Println(err)
+}</span>
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package handler
+
+import (
+        "context"
+        "net/http"
+        "strings"
+)
+
+const (
+        userCTX = "user"
+)
+
+func (h *Handler) authMiddleware(next http.Handler) http.Handler <span class="cov8" title="1">{
+        return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) </span><span class="cov8" title="1">{
+                authHeader := r.Header.Get(AuthorizationHeader)
+                headerParts := strings.Split(authHeader, " ")
+                if len(headerParts) != 2 </span><span class="cov8" title="1">{
+                        JSONResponse(w, http.StatusUnauthorized, interfaceMap{"message": "You are not authorized"})
+                        return
+                }</span>
+                <span class="cov8" title="1">token := headerParts[1]
+                user, err := h.services.ParseToken(token)
+                if err != nil </span><span class="cov8" title="1">{
+                        JSONResponse(w, http.StatusUnauthorized, interfaceMap{"message": "Bad access token"})
+                        return
+                }</span>
+                <span class="cov8" title="1">ctx := r.Context()
+                ctx = context.WithValue(ctx, userCTX, user)
+                next.ServeHTTP(w, r.WithContext(ctx))</span>
+        },
+        )
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package handler
+
+import (
+        "encoding/json"
+        "github.com/gorilla/mux"
+        "gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/structs"
+        "go.mongodb.org/mongo-driver/bson/primitive"
+        "net/http"
+)
+
+const (
+        AuthorizationHeader = "Authorization"
+)
+
+func (h *Handler) getAllPosts(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        posts, err := h.services.GetAllPosts()
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInternalServerError, interfaceMap{"message": err})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, posts)</span>
+}
+
+func (h *Handler) newPost(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := request.Context().Value(userCTX).(structs.Author)
+        post := structs.NewPostData{}
+        err := json.NewDecoder(request.Body).Decode(&amp;post)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "bad request body"})
+                return
+        }</span>
+        <span class="cov8" title="1">newPost, err := h.services.Posts.NewPost(post, user)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "error occurred while creating a post"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, newPost)</span>
+}
+
+func (h *Handler) getPostsByCategory(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        vars := mux.Vars(request)
+        category, ok := vars[CategoryName]
+        if !ok </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "empty category"})
+                return
+        }</span>
+        <span class="cov8" title="1">posts, err := h.services.Posts.PostsByCategory(category)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "storage is not doing well"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, posts)</span>
+}
+
+func (h *Handler) getPost(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        vars := mux.Vars(request)
+        if !primitive.IsValidObjectID(vars[PostID]) </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "post id bad format"})
+                return
+        }</span>
+        //  nolint
+        <span class="cov8" title="1">id, _ := primitive.ObjectIDFromHex(vars[PostID])
+        post, err := h.services.Posts.GetPostByID(id)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "couldn't get post from storage"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, post)</span>
+}
+
+func (h *Handler) deletePost(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := request.Context().Value(userCTX).(structs.Author)
+
+        vars := mux.Vars(request)
+        if !primitive.IsValidObjectID(vars[PostID]) </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "bad id parameter"})
+                return
+        }</span>
+        //  nolint
+        <span class="cov8" title="1">id, _ := primitive.ObjectIDFromHex(vars[PostID])
+        err := h.services.DeletePostByID(id, user.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "coulnd't delete post"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, interfaceMap{"message": "success"})</span>
+}
+
+func (h *Handler) getPostsByUserLogin(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        vars := mux.Vars(request)
+        username, ok := vars[UserLogin]
+        if !ok </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "empty username"})
+                return
+        }</span>
+        <span class="cov8" title="1">posts, err := h.services.Posts.PostsByUsername(username)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "storage is not doing well"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, posts)</span>
+}
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package handler
+
+import (
+        "github.com/gorilla/mux"
+        "gitlab.com/vk-go/lectures-2022-2/06_databases/99_hw/redditclone/structs"
+        "go.mongodb.org/mongo-driver/bson/primitive"
+        "net/http"
+)
+
+func (h *Handler) upvote(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := request.Context().Value(userCTX).(structs.Author)
+
+        vars := mux.Vars(request)
+        if !primitive.IsValidObjectID(vars[PostID]) </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "bad post_id parameter"})
+                return
+        }</span>
+        <span class="cov8" title="1">id, _ := primitive.ObjectIDFromHex(vars[PostID]) //  nolint
+        vote := structs.Vote{
+                User: user.ID,
+                Vote: 0,
+        }
+        post, err := h.services.Posts.Upvote(id, vote)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "couldn't vote for the post"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, post)</span>
+}
+
+func (h *Handler) downvote(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := request.Context().Value(userCTX).(structs.Author)
+
+        vars := mux.Vars(request)
+        if !primitive.IsValidObjectID(vars[PostID]) </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "bad post_id parameter"})
+                return
+        }</span>
+        <span class="cov8" title="1">id, _ := primitive.ObjectIDFromHex(vars[PostID]) //  nolint
+        vote := structs.Vote{
+                User: user.ID,
+                Vote: 0,
+        }
+        post, err := h.services.Posts.DownVote(id, vote)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "couldn't vote for the post"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, post)</span>
+}
+
+func (h *Handler) unvote(writer http.ResponseWriter, request *http.Request) <span class="cov8" title="1">{
+        user := request.Context().Value(userCTX).(structs.Author)
+
+        vars := mux.Vars(request)
+        if !primitive.IsValidObjectID(vars[PostID]) </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusBadRequest, interfaceMap{"message": "bad id"})
+                return
+        }</span>
+        <span class="cov8" title="1">id, _ := primitive.ObjectIDFromHex(vars[PostID]) //  nolint
+
+        post, err := h.services.UnVote(id, user.ID)
+        if err != nil </span><span class="cov8" title="1">{
+                JSONResponse(writer, http.StatusInsufficientStorage, interfaceMap{"message": "couldn't unvote"})
+                return
+        }</span>
+        <span class="cov8" title="1">JSONResponse(writer, http.StatusOK, post)</span>
+}
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

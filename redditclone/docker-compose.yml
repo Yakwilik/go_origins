@@ -1,0 +1,66 @@
+version: '3.7'
+services:
+#  server:
+#    image: golang
+#    command: bash -c "cd 06_databases/99_hw/redditclone && go run cmd/redditclone/main.go"
+#    restart: always
+#    volumes:
+#      - "${PWD}/../../../:/project/"
+#    working_dir: '/project'
+#    depends_on:
+#      - sessions-db
+#      - users-db
+#    networks:
+#      - service-network
+#    ports:
+#      - '8081:8080'
+
+  sessions-db:
+    image: mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+
+    volumes:
+      - "sessions_data:/var/lib/my_sql/data/"
+      - "./configs/init.sql:/docker-entrypoint-initdb.d/init.sql"
+      - "./configs/mysqlSess:/etc/mysql/conf.d"
+    networks:
+      - service-network
+    ports:
+      - '3301:3301'
+  users-db:
+    image: mysql
+    environment:
+      MYSQL_RANDOM_ROOT_PASSWORD: 1
+    volumes:
+      - "users_data:/var/lib/my_sql/data/"
+      - "./configs/init.sql:/docker-entrypoint-initdb.d/init.sql"
+      - "./configs/mysqlUsers:/etc/mysql/conf.d"
+    networks:
+      - service-network
+    ports:
+      - '3302:3302'
+  posts-db:
+      image: 'mongo'
+      volumes:
+        - "posts_data:/data/db/"
+        - "./configs/mongoconf/mongod.conf:/etc/mongod.conf"
+      environment:
+        - MONGO_INITDB_DATABASE=coursera
+        - MONGO_INITDB_ROOT_USERNAME=root
+        - MONGO_INITDB_ROOT_PASSWORD=example
+      networks:
+        - service-network
+      ports:
+        - '27017-27019:27017-27019'
+
+
+volumes:
+  sessions_data:
+  users_data:
+  posts_data:
+
+
+networks:
+  service-network:
+    driver: bridge
