@@ -22,6 +22,10 @@ func (p *PostfixParser) GetInfixExpression() string {
 	return p.infixExpression
 }
 
+func (p *PostfixParser) SetInfixExpression(expr string) {
+	p.infixExpression = expr
+}
+
 func isOperator(value string) bool {
 	operators := "+-*/"
 	return strings.Contains(operators, value)
@@ -118,7 +122,7 @@ func (p *PostfixParser) Calculate() float64 {
 			}
 		}
 	}
-	return p.valuesStack.Top()
+	return p.valuesStack.GetTopOrDefault()
 }
 
 func executeOperation(operator string, lhs, rhs float64) float64 {
