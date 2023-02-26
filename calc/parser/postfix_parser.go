@@ -1,10 +1,12 @@
 package parser
 
 import (
-	"calc/calc/utils"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
+
+	"calc/calc/utils"
 )
 
 type PostfixParser struct {
@@ -108,7 +110,10 @@ func (p *PostfixParser) Calculate() float64 {
 		case utils.IsPartOfNumber(currentToken):
 			{
 				res, parsedRunes, _ := utils.ParseNumber(p.postfixExpression, i)
-				number, _ := strconv.ParseFloat(res, 64)
+				number, err := strconv.ParseFloat(res, 64)
+				if err != nil {
+					log.Println(err)
+				}
 				p.valuesStack.PushBack(number)
 				i += parsedRunes
 			}
