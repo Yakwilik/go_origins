@@ -80,9 +80,15 @@ func (p *PostfixParser) Parse() (err error) {
 				last = currentToken
 			}
 		case isOperator(currentToken):
+			if isOperator(last) && strings.Contains("+~*/", currentToken) || currentToken == "-" && last == "~" {
+				return fmt.Errorf("unexpected token: %s in %d position", currentToken, i)
+			}
 			// учитываем унарный минус
 			if currentToken == "-" && strings.Contains("(+-*/ ", last) {
 				p.postfixExpression += "0 "
+				p.operationStack.PushBack(currentToken)
+				last = "~"
+				continue
 			}
 			for !p.operationStack.Empty() &&
 				getOperatorPriority(currentToken) <=
@@ -146,4 +152,13 @@ func executeOperation(operator string, lhs, rhs float64) float64 {
 
 func (p *PostfixParser) GetParsedExpression() string {
 	return p.postfixExpression
+}
+
+func (p *PostfixParser) ParseAndCalculate(expression string) (float64, error) {
+	p.SetInfixExpression(expression)
+	err := p.Parse()
+	if err != nil {
+		return 0, err
+	}
+	return p.Calculate(), nil
 }

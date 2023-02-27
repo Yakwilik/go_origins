@@ -1,6 +1,10 @@
 package utils
 
-import "strings"
+import (
+	"bufio"
+	"os"
+	"strings"
+)
 
 func IsPartOfNumber(value string) bool {
 	digits := ".0123456789"
@@ -13,4 +17,16 @@ func IsOpeningBracket(value string) bool {
 
 func IsClosingBracket(value string) bool {
 	return value == ")"
+}
+
+func GetInput() (string, error) {
+	if len(os.Args) > 1 {
+		return os.Args[1], nil
+	}
+
+	scanner := bufio.NewScanner(os.Stdin)
+
+	scanner.Scan()
+
+	return scanner.Text(), scanner.Err()
 }

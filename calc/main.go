@@ -1,15 +1,15 @@
 package main
 
 import (
+	"calc/calc/parser"
+	"calc/calc/utils"
 	"fmt"
 	"log"
-
-	"calc/calc/parser"
 )
 
 func main() {
-	var expression string
-	_, err := fmt.Scanln(&expression)
+	expression, err := utils.GetInput()
+
 	if err != nil {
 		log.Fatalln(err)
 	}
