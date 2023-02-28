@@ -14,8 +14,8 @@ func TestNewPostfixParser(t *testing.T) {
 
 func TestPostfixParser_Calculate(t *testing.T) {
 	parser := NewPostfixParser("6+3")
-
-	if parser.Calculate() != 0 {
+	res, _ := parser.Calculate()
+	if res != 0 {
 		t.Errorf("parser must return 0, if Parse function haven`t been called")
 	}
 }
@@ -46,7 +46,7 @@ func TestPostfixParser_SetInfixExpression(t *testing.T) {
 func TestPostfixParser_Parse(t *testing.T) {
 	parser := NewPostfixParser("6+3")
 	_ = parser.Parse()
-	ans := parser.Calculate()
+	ans, _ := parser.Calculate()
 	if ans != 9 {
 		t.Errorf("wrong answer")
 	}
@@ -70,19 +70,19 @@ func TestPostfixParser_Parse(t *testing.T) {
 
 	parser.SetInfixExpression("5*(3+6)")
 	_ = parser.Parse()
-	ans = parser.Calculate()
+	ans, _ = parser.Calculate()
 	if ans != 45 {
 		t.Errorf("wrong answer")
 	}
 	parser.SetInfixExpression("-5*(3+6)")
 	_ = parser.Parse()
-	ans = parser.Calculate()
+	ans, _ = parser.Calculate()
 	if ans != -45 {
 		t.Errorf("wrong answer")
 	}
 	parser.SetInfixExpression("5*(3+6)/2")
 	_ = parser.Parse()
-	ans = parser.Calculate()
+	ans, _ = parser.Calculate()
 	if ans != 45/2. {
 		t.Errorf("wrong answer")
 	}

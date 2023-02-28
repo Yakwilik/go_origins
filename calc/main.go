@@ -14,11 +14,11 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	pars := parser.NewPostfixParser(expression)
-	err = pars.Parse()
+	pars := parser.PostfixParser{}
+	result, err := pars.ParseAndCalculate(expression)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	fmt.Println("result: ", pars.Calculate())
+	fmt.Println("result: ", result)
 }

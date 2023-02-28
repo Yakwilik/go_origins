@@ -2,7 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -109,16 +108,19 @@ func (p *PostfixParser) Parse() (err error) {
 	return err
 }
 
-func (p *PostfixParser) Calculate() float64 {
+func (p *PostfixParser) Calculate() (float64, error) {
 	for i := 0; i < len(p.postfixExpression); i++ {
 		currentToken := string(p.postfixExpression[i])
 		switch {
 		case utils.IsPartOfNumber(currentToken):
 			{
-				res, parsedRunes, _ := utils.ParseNumber(p.postfixExpression, i)
+				res, parsedRunes, err := utils.ParseNumber(p.postfixExpression, i)
+				if err != nil {
+					return 0, err
+				}
 				number, err := strconv.ParseFloat(res, 64)
 				if err != nil {
-					log.Println(err)
+					return 0, err
 				}
 				p.valuesStack.PushBack(number)
 				i += parsedRunes
@@ -133,7 +135,7 @@ func (p *PostfixParser) Calculate() float64 {
 			}
 		}
 	}
-	return p.valuesStack.GetTopOrDefault()
+	return p.valuesStack.GetTopOrDefault(), nil
 }
 
 func executeOperation(operator string, lhs, rhs float64) float64 {
@@ -160,5 +162,5 @@ func (p *PostfixParser) ParseAndCalculate(expression string) (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	return p.Calculate(), nil
+	return p.Calculate()
 }
