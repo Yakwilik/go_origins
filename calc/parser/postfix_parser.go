@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -28,7 +29,7 @@ func (p *PostfixParser) SetInfixExpression(expr string) {
 }
 
 func isOperator(value string) bool {
-	operators := "+-*/"
+	operators := "+-*/^"
 	return strings.Contains(operators, value)
 }
 
@@ -36,7 +37,7 @@ func getOperatorPriority(value string) int {
 	switch {
 	case strings.Contains("+-", value):
 		return 1
-	case strings.Contains("*/", value):
+	case strings.Contains("*/^", value):
 		return 2
 	default:
 		return -1
@@ -47,6 +48,7 @@ func (p *PostfixParser) Parse() (err error) {
 	p.infixExpression = strings.ReplaceAll(p.infixExpression, " ", "")
 	p.infixExpression = strings.ReplaceAll(p.infixExpression, ",", ".")
 	last := " "
+	needCloseBracket := false
 	for i := 0; i < len(p.infixExpression); i++ {
 		currentToken := string(p.infixExpression[i])
 		switch {
@@ -79,13 +81,26 @@ func (p *PostfixParser) Parse() (err error) {
 				last = currentToken
 			}
 		case isOperator(currentToken):
-			if isOperator(last) && strings.Contains("+~*/", currentToken) || currentToken == "-" && last == "~" {
+			if isOperator(last) && strings.Contains("+~*/^", currentToken) || currentToken == "-" && last == "~" {
 				return fmt.Errorf("unexpected token: %s in %d position", currentToken, i)
 			}
+			if needCloseBracket && strings.Contains("+-", currentToken) {
+				if !p.operationStack.Has("(") {
+					return fmt.Errorf("ошибка при парсинге выражения,"+
+						"не удалось найти открывающую скобоку для закрывающей на позиции %d", i)
+				}
+				for p.operationStack.Top() != "(" {
+					p.postfixExpression += p.operationStack.Top()
+					p.operationStack.Pop()
+				}
+				p.operationStack.Pop()
+			}
 			// учитываем унарный минус
-			if currentToken == "-" && strings.Contains("(+-*/ ", last) {
+			if currentToken == "-" && strings.Contains("(+-*^/ ", last) {
 				p.postfixExpression += "0 "
 				p.operationStack.PushBack(currentToken)
+				p.operationStack.PushBack("(")
+				needCloseBracket = true
 				last = "~"
 				continue
 			}
@@ -148,6 +163,9 @@ func executeOperation(operator string, lhs, rhs float64) float64 {
 		return lhs * rhs
 	case "/":
 		return lhs / rhs
+	case "^":
+		return math.Pow(lhs, rhs)
+
 	}
 	return 0
 }

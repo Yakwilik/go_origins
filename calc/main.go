@@ -21,4 +21,5 @@ func main() {
 	}
 
 	fmt.Println("result: ", result)
+	fmt.Println("parsed: ", pars.GetParsedExpression())
 }
