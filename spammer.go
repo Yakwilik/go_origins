@@ -16,7 +16,6 @@ func RunPipeline(cmds ...cmd) {
 		wg.Add(1)
 		go DoneMaker(wg, cmds[i], chans[i], chans[i+1])
 	}
-
 }
 
 func DoneMaker(waiter *sync.WaitGroup, job cmd, in chan interface{}, out chan interface{}) {
@@ -95,24 +94,18 @@ func hasSpamAsync(out chan interface{}, msgID MsgID, limiterChan chan interface{
 		<-limiterChan
 		wg.Done()
 	}()
-
 	result, err := HasSpam(msgID)
 	if err != nil {
 		return
 	}
-	msgData := MsgData{
-		ID:      msgID,
-		HasSpam: result,
-	}
+	msgData := MsgData{ID: msgID, HasSpam: result}
 	out <- msgData
-
 }
 
 func CheckSpam(in, out chan interface{}) {
 	concurrentChan := make(chan interface{}, HasSpamMaxAsyncRequests)
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
-
 	for inChanData := range in {
 		wg.Add(1)
 		go hasSpamAsync(out, inChanData.(MsgID), concurrentChan, wg)
@@ -121,7 +114,6 @@ func CheckSpam(in, out chan interface{}) {
 
 func CombineResults(in, out chan interface{}) {
 	msgDataSlice := make([]MsgData, 0)
-
 	for inChanData := range in {
 		msgDataSlice = append(msgDataSlice, inChanData.(MsgData))
 	}
