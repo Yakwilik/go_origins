@@ -1,20 +1,21 @@
 package main
 
 import (
+	"fmt"
 	"gopkg.in/typ.v4/slices"
+	"sort"
 	"sync"
 )
 
 func RunPipeline(cmds ...cmd) {
-	chans := make([]chan interface{}, 0, 6)
-	chans = append(chans, make(chan interface{}))
+	chans := make([]chan interface{}, 1)
 	wg := &sync.WaitGroup{}
+	defer wg.Wait()
 	for i := range cmds {
 		chans = append(chans, make(chan interface{}))
 		wg.Add(1)
 		go DoneMaker(wg, cmds[i], chans[i], chans[i+1])
 	}
-	wg.Wait()
 
 }
 
@@ -51,12 +52,12 @@ func SelectUsers(in, out chan interface{}) {
 		uniqueUsers:      make(map[string]bool, 0),
 		uniqueUsersMutex: &sync.RWMutex{},
 	}
+	defer userSyncTool.wg.Wait()
 
 	for inChanData := range in {
 		userSyncTool.wg.Add(1)
 		go getUserIteration(out, inChanData, userSyncTool)
 	}
-	userSyncTool.wg.Wait()
 }
 
 func selectMessagesIteration(out chan interface{}, users []User, wg *sync.WaitGroup) {
@@ -72,28 +73,66 @@ func selectMessagesIteration(out chan interface{}, users []User, wg *sync.WaitGr
 
 func SelectMessages(in, out chan interface{}) {
 	wg := &sync.WaitGroup{}
-	users := make([]User, 0, 2)
+	defer wg.Wait()
+	users := make([]User, 0, GetMessagesMaxUsersBatch)
 	for inChanData := range in {
 		users = append(users, inChanData.(User))
-		if len(users) == 2 {
+		if len(users) == GetMessagesMaxUsersBatch {
 			wg.Add(1)
 			go selectMessagesIteration(out, slices.Clone(users), wg)
-			users = make([]User, 0, 2)
+			users = make([]User, 0, GetMessagesMaxUsersBatch)
 		}
 	}
 	if len(users) > 0 {
 		wg.Add(1)
 		go selectMessagesIteration(out, users, wg)
 	}
-	wg.Wait()
+}
+
+func hasSpamAsync(out chan interface{}, msgID MsgID, limiterChan chan interface{}, wg *sync.WaitGroup) {
+	limiterChan <- true
+	defer func() {
+		<-limiterChan
+		wg.Done()
+	}()
+
+	result, err := HasSpam(msgID)
+	if err != nil {
+		return
+	}
+	msgData := MsgData{
+		ID:      msgID,
+		HasSpam: result,
+	}
+	out <- msgData
+
 }
 
 func CheckSpam(in, out chan interface{}) {
-	// in - MsgID
-	// out - MsgData
+	concurrentChan := make(chan interface{}, HasSpamMaxAsyncRequests)
+	wg := &sync.WaitGroup{}
+	defer wg.Wait()
+
+	for inChanData := range in {
+		wg.Add(1)
+		go hasSpamAsync(out, inChanData.(MsgID), concurrentChan, wg)
+	}
 }
 
 func CombineResults(in, out chan interface{}) {
-	// in - MsgData
-	// out - string
+	msgDataSlice := make([]MsgData, 0)
+
+	for inChanData := range in {
+		msgDataSlice = append(msgDataSlice, inChanData.(MsgData))
+	}
+	sort.Slice(msgDataSlice, func(i, j int) bool {
+		if msgDataSlice[i].HasSpam == msgDataSlice[j].HasSpam {
+			return msgDataSlice[i].ID < msgDataSlice[j].ID
+		} else {
+			return msgDataSlice[i].HasSpam
+		}
+	})
+	for _, msgData := range msgDataSlice {
+		out <- fmt.Sprintf("%t %d", msgData.HasSpam, msgData.ID)
+	}
 }
